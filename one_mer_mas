@@ -1,0 +1,52 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Выбор способа заполнения
+        Console.Write("1 - случайно, 2 - вручную: ");
+        int choice = int.Parse(Console.ReadLine());
+
+        // Длина массива
+        Console.Write("Длина массива: ");
+        int n = int.Parse(Console.ReadLine());
+        int[] a = new int[n];
+
+        // Заполнение массива
+        if (choice == 1)
+        {
+            Random rnd = new Random();
+            for (int i = 0; i < n; i++)
+                a[i] = rnd.Next(-100, 101);
+            Console.WriteLine("Массив: " + string.Join(", ", a));
+        }
+        else
+        {
+            for (int i = 0; i < n; i++)
+            {
+                Console.Write("Элемент " + (i + 1) + ": ");
+                a[i] = int.Parse(Console.ReadLine());
+            }
+        }
+
+        // Подсчёт лестниц
+        int ladders = 0;
+        int run = 1; // длина текущей возрастающей серии
+
+        for (int i = 1; i < n; i++)
+        {
+            if (a[i] > a[i - 1])
+                run++;           // продолжаем лестницу
+            else
+            {
+                if (run >= 2)    // закончилась лестница длиной >= 2
+                    ladders++;
+                run = 1;         // начинаем новую серию
+            }
+        }
+        if (run >= 2) ladders++; // проверяем последнюю серию
+
+        Console.WriteLine("Количество лестниц: " + ladders);
+    }
+}
