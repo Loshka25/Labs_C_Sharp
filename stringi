@@ -1,0 +1,114 @@
+using System;
+
+class Program 
+{
+    static void Main() 
+    {
+        string s1 = ""; 
+        string s2 = "";
+        string s3 = "";
+
+        Console.WriteLine("В ручную или случаная генирация? 1 для ручного ввода и 2 для случайной генирации");
+
+        string choice1 = Console.ReadLine(); 
+
+        if (choice1 == "1")
+        {
+            Console.WriteLine("Введите Строку 1: ");
+            s1 = Console.ReadLine();
+            Console.WriteLine("Введите Строку 2: ");
+            s2 = Console.ReadLine();
+            Console.WriteLine("Введите Строку 3: ");
+            s3 = Console.ReadLine();
+        }
+        else 
+        {
+            Console.WriteLine("Генерация случайных 3 строк");
+            Random rnd = new Random(); 
+            string[] words = { "Синий", "Быстрый", "Лесной", "Тихий", "Добрый", 
+                               "Кот", "Дом", "Сон", "Мир", "Путь", 
+                               "Река", "Гора", "Ветер", "Снег", "Лето" };
+
+            s1 = BuildRandomString(rnd, words);
+            s2 = BuildRandomString(rnd, words);
+            s3 = BuildRandomString(rnd, words);
+        }
+
+        Console.WriteLine("\n 3 исходные строки");
+        Console.WriteLine("1: " + s1);
+        Console.WriteLine("2: " + s2);
+        Console.WriteLine("3: " + s3);
+
+        // ==========================================
+        // ШАГ 2: Создание 4-й строки
+        // ==========================================
+        Console.WriteLine("\nКакие строки объединить?");
+        Console.WriteLine("Введите '1-2' (для 1 и 2)");
+        Console.WriteLine("Введите '1-3' (для 1 и 3)");
+        Console.WriteLine("Введите '2-3' (для 2 и 3)");
+        
+        string choice2 = Console.ReadLine();
+        string s4 = ""; // Наша 4-я строка
+
+        if (choice2 == "1-2") 
+        { 
+            s4 = s1 + " " + s2; 
+            Console.WriteLine("Объединяем 1 и 2..."); 
+        }
+        else if (choice2 == "1-3") 
+        { 
+            s4 = s1 + " " + s3; 
+            Console.WriteLine("Объединяем 1 и 3..."); 
+        }
+        else if (choice2 == "2-3") 
+        { 
+            s4 = s2 + " " + s3; 
+            Console.WriteLine("Объединяем 2 и 3..."); 
+        }
+        else 
+        { 
+            Console.WriteLine("Некорректный ввод. По умолчанию 1 и 2.");
+            s4 = s1 + " " + s2; 
+        }
+
+        Console.WriteLine("Новая 4-я строка: " + s4);
+
+        Console.WriteLine("\nСортируем все 4 строки по алфавиту(через пузырек)");
+
+        string[] arr = { s1, s2, s3, s4 }; 
+        
+        // Внешний цикл: говорит, сколько раз нам нужно пройтись по массиву
+        for (int i = 0; i < arr.Length - 1; i++) 
+        {
+            // Вложенный цикл: сравнивает соседние ячейки
+            for (int j = 0; j < arr.Length - 1 - i; j++) 
+            {
+                if (string.Compare(arr[j], arr[j + 1]) > 0) 
+                {
+                    // Если текущая идет ПОЗЖЕ в алфавите, меняем их местами
+                    string temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+
+        Console.WriteLine("\nОтсортированные строки:");
+        for (int i = 0; i < arr.Length; i++) 
+        {
+            Console.WriteLine((i + 1) + ": " + arr[i]);
+        }
+    }
+
+    // Метод для генерации случайной строки
+    static string BuildRandomString(Random rnd, string[] words)
+    {
+        string result = ""; 
+        for (int i = 0; i < 6; i++) 
+        {
+            int randomIndex = rnd.Next(words.Length); 
+            result = result + words[randomIndex] + " "; 
+        }
+        return result; 
+    }
+}
