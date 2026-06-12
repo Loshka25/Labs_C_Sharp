@@ -1,0 +1,153 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("=== Универсальный Stack<T> ===");
+        Console.WriteLine("Выберите тип данных:");
+        Console.WriteLine("1. int      (целые числа: 10, -5)");
+        Console.WriteLine("2. double   (дробные числа: 3.14)");
+        Console.WriteLine("3. float    (дробные числа: 2.5f)");
+        Console.WriteLine("4. bool     (логические: true, false)");
+        Console.WriteLine("5. char     (символы: A, #)");
+        Console.WriteLine("6. string   (строки: Привет)");
+        Console.Write("Ваш выбор (1-6): ");
+
+        string choice = Console.ReadLine();
+
+
+        switch (choice)
+        {
+            case "1": RunStack<int>(); break;
+            case "2": RunStack<double>(); break;
+            case "3": RunStack<float>(); break;
+            case "4": RunStack<bool>(); break;
+            case "5": RunStack<char>(); break;
+            case "6": RunStack<string>(); break;
+            default: Console.WriteLine("Неверный выбор."); return;
+        }
+    }
+
+    static void RunStack<T>()
+    {
+        Stack<T> stack = new Stack<T>();
+        Console.WriteLine($"\n--- Работа со стеком типа: {typeof(T).Name} ---");
+        Console.WriteLine("Введите начальные элементы по одному.");
+        Console.WriteLine("(Нажмите Enter на пустой строке, чтобы завершить ввод)\n");
+
+        // 1. Начальное заполнение
+        while (true)
+        {
+            Console.Write("Элемент: ");
+            string input = Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(input)) break; // Выход из цикла при пустом вводе
+
+            if (TryConvert(input, out T value))
+            {
+                stack.Push(value);
+            }
+            else
+            {
+                Console.WriteLine($"[Ошибка] Не удалось преобразовать '{input}' в тип {typeof(T).Name}");
+            }
+        }
+
+        // 2. Главное меню методов
+        while (true)
+        {
+            Console.WriteLine($"\nСтек сейчас: [{string.Join(" | ", stack)}]  (Count: {stack.Count})");
+            Console.WriteLine("Методы: 1-Push, 2-Pop, 3-Peek, 4-TryPop, 5-TryPeek, 6-Contains, 7-Clear, 0-Выход");
+            Console.Write("Выберите действие: ");
+
+            string cmd = Console.ReadLine();
+
+            switch (cmd)
+            {
+                case "1": // Push
+                    Console.Write("Введите значение для добавления: ");
+                    if (TryConvert(Console.ReadLine(), out T newVal))
+                    {
+                        stack.Push(newVal);
+                        Console.WriteLine("-> Элемент успешно добавлен (Push).");
+                    }
+                    else Console.WriteLine("-> Ошибка формата!");
+                    break;
+
+                case "2": // Pop
+                    if (stack.Count > 0)
+                        Console.WriteLine($"-> Удалён и возвращён элемент (Pop): {stack.Pop()}");
+                    else
+                        Console.WriteLine("-> Стек пуст! Pop невозможен.");
+                    break;
+
+                case "3": // Peek
+                    if (stack.Count > 0)
+                        Console.WriteLine($"-> Верхний элемент без удаления (Peek): {stack.Peek()}");
+                    else
+                        Console.WriteLine("-> Стек пуст! Peek невозможен.");
+                    break;
+
+                case "4": // TryPop
+                    if (stack.TryPop(out T popped))
+                        Console.WriteLine($"-> TryPop успешен, удалено: {popped}");
+                    else
+                        Console.WriteLine("-> TryPop не удался, стек пуст.");
+                    break;
+
+                case "5": // TryPeek
+                    if (stack.TryPeek(out T peeked))
+                        Console.WriteLine($"-> TryPeek успешен, верхний элемент: {peeked}");
+                    else
+                        Console.WriteLine("-> TryPeek не удался, стек пуст.");
+                    break;
+
+                case "6": // Contains
+                    Console.Write("Введите значение для поиска: ");
+                    if (TryConvert(Console.ReadLine(), out T searchVal))
+                        Console.WriteLine($"-> Содержит ли стек '{searchVal}'? {stack.Contains(searchVal)}");
+                    else
+                        Console.WriteLine("-> Ошибка формата!");
+                    break;
+
+                case "7": // Clear
+                    stack.Clear();
+                    Console.WriteLine("-> Стек полностью очищен (Clear).");
+                    break;
+
+                case "0": // Выход
+                    Console.WriteLine("Выход из программы.");
+                    return;
+
+                default:
+                    Console.WriteLine("-> Неизвестная команда.");
+                    break;
+            }
+        }
+    }
+
+
+    // Превращает строку из консоли в любой тип T (int, double, bool, string и т.д.)
+    static bool TryConvert<T>(string input, out T result)
+    {
+        result = default;
+        try
+        {
+            // Для строк разрешаем пустые значения и пробелы
+            if (typeof(T) == typeof(string))
+            {
+                result = (T)(object)input;
+                return true;
+            }
+
+            result = (T)Convert.ChangeType(input, typeof(T));
+            return true;
+        }
+        catch
+        {
+            return false; // Если конвертация не удалась (например, ввели "abc" вместо числа)
+        }
+    }
+}
