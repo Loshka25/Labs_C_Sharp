@@ -5,7 +5,6 @@ class Program
 {
     static void Main()
     {
-        Console.WriteLine("=== Универсальный Stack<T> ===");
         Console.WriteLine("Выберите тип данных:");
         Console.WriteLine("1. int      (целые числа: 10, -5)");
         Console.WriteLine("2. double   (дробные числа: 3.14)");
@@ -33,7 +32,7 @@ class Program
     static void RunStack<T>()
     {
         Stack<T> stack = new Stack<T>();
-        Console.WriteLine($"\n--- Работа со стеком типа: {typeof(T).Name} ---");
+        Console.WriteLine($"\n Работа со стеком типа: {typeof(T).Name} ");
         Console.WriteLine("Введите начальные элементы по одному.");
         Console.WriteLine("(Нажмите Enter на пустой строке, чтобы завершить ввод)\n");
 
@@ -73,21 +72,21 @@ class Program
                         stack.Push(newVal);
                         Console.WriteLine("-> Элемент успешно добавлен (Push).");
                     }
-                    else Console.WriteLine("-> Ошибка формата!");
+                    else Console.WriteLine("-> Ошибка формата");
                     break;
 
                 case "2": // Pop
                     if (stack.Count > 0)
                         Console.WriteLine($"-> Удалён и возвращён элемент (Pop): {stack.Pop()}");
                     else
-                        Console.WriteLine("-> Стек пуст! Pop невозможен.");
+                        Console.WriteLine("-> Стек пуст. Pop невозможен.");
                     break;
 
                 case "3": // Peek
                     if (stack.Count > 0)
                         Console.WriteLine($"-> Верхний элемент без удаления (Peek): {stack.Peek()}");
                     else
-                        Console.WriteLine("-> Стек пуст! Peek невозможен.");
+                        Console.WriteLine("-> Стек пуст. Peek невозможен.");
                     break;
 
                 case "4": // TryPop
@@ -109,7 +108,7 @@ class Program
                     if (TryConvert(Console.ReadLine(), out T searchVal))
                         Console.WriteLine($"-> Содержит ли стек '{searchVal}'? {stack.Contains(searchVal)}");
                     else
-                        Console.WriteLine("-> Ошибка формата!");
+                        Console.WriteLine("-> Ошибка формата");
                     break;
 
                 case "7": // Clear
