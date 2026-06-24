@@ -44,31 +44,22 @@ namespace Lab5
         public abstract double perimeter();
     }
 
-    class Pnt
-    {
-        public double x { get; }//получаем статичную, неизменяемую точку благодаря наличию только get
-        public double y { get; }
-
-        public Pnt(double x1, double y1)
-        {
-            x = x1;
-            y = y1;
-        }
-
-        public override string ToString()
-        {
-            return "(" + x.ToString("0.###") + "; " + y.ToString("0.###") + ")";
-        }
-    }
-
     class Rect : Fig, IIO, ISimilar
     {
-        private const double eps = 1e-9;//минимальное число для того чтобы 0.1+0.2==0.3 и подобные корректно работали
         private double _a;
         private double _b;
-
-        public Pnt A { get; set; } // левый верхний угол хранится как объект Pnt
-
+        private double _Ax;
+        private double _Ay;
+        public double Ax
+        {
+            get { return _Ax; }
+            set { _Ax = value; }
+        }
+        public double Ay
+        {
+            get { return _Ay; }
+            set { _Ay = value; }
+        }
         public double a
         {
             get { return _a; }
@@ -94,31 +85,38 @@ namespace Lab5
                 _b = value;
             }
         }
+        public override string ToString()
+        {
+            return "(" + Ax.ToString("0.###") + "; " + Ay.ToString("0.###") + ")";
+        }
 
         public Rect() : this(0, 0, 3, 2)//вызываем по умолчанию
         {
         }
 
-        public Rect(double x, double y, double a, double b)
+        public Rect(double ax, double ay, double a, double b)
         {
-            A = new Pnt(x, y);
+            Ax = ax;
+            Ay = ay;
             this.a = a;
             this.b = b;
         }
 
-        // храним только A и длины сторон, остальные вершины вычисляются
-        public Pnt pA() { return A; }                              // левый верхний
-        public Pnt pB() { return new Pnt(A.x + a, A.y); }         // правый верхний
-        public Pnt pC() { return new Pnt(A.x + a, A.y - b); }     // правый нижний
-        public Pnt pD() { return new Pnt(A.x, A.y - b); }     // левый нижний
+        //остальные вершины вычисляются
+        public (double x, double y) pA() => (Ax, Ay);
+        public (double x, double y) pB() => (Ax + a, Ay);
+        public (double x, double y) pC() => (Ax + a, Ay - b);
+        public (double x, double y) pD() => (Ax, Ay - b);
+
 
         public void input() // ввод
         {
-            double x = readD("x точки A (левый верхний): ");
-            double y = readD("y точки A (левый верхний): ");
-            A = new Pnt(x, y);
+            Ax = readD("x точки A (левый верхний): ");
+            Ay = readD("y точки A (левый верхний): ");
+
             a = readPos("сторона a (горизонтальная): ");
             b = readPos("сторона b (вертикальная): ");
+
         }
 
         public void output() // вывод
@@ -137,21 +135,16 @@ namespace Lab5
             return a * b;
         }
 
-        public Pnt center() // центр описанной окружности = центр прямоугольника
-        {
-            return new Pnt(A.x + a / 2.0, A.y - b / 2.0);
-        }
+        public (double x, double y) center() => (Ax + a / 2.0, Ay - b / 2.0);
 
         public bool isSquare() // проверка на квадрат
         {
-            return Math.Abs(a - b) < eps;
+            return a == b;
         }
 
-        public Rect symOrigin() // симметричный относительно начала координат
+        public Rect symOrigin()
         {
-            double nx = -A.x - a;//уравнение пишем с знаком минус
-            double ny = -A.y + b;
-            return new Rect(nx, ny, a, b);
+            return new Rect(-Ax - a, -Ay + b, a, b);
         }
 
         public bool isSimilar(Rect other) // подобие двух прямоугольников
@@ -161,28 +154,25 @@ namespace Lab5
                 return false;
             }
             // a/b == c/d  =>  a*d == c*b
-            return Math.Abs(a * other.b - other.a * b) < eps;
+            return a * other.b == other.a * b;
         }
 
-        public bool coversAll() // пересечение со всеми четвертями
+        public bool coversAll()
         {
-            double xLeft = A.x;
-            double xRight = A.x + a;
-            double yTop = A.y;
-            double yBot = A.y - b;
+            double xLeft = Ax;
+            double xRight = Ax + a;
+            double yTop = Ay;
+            double yBot = Ay - b;
 
             return xLeft < 0 && xRight > 0 && yBot < 0 && yTop > 0;
         }
 
-        public bool intersects(Rect other) // пересечение двух прямоугольников
+        public bool intersects(Rect other)
         {
-            if (other == null)
-            {
-                return false;
-            }
+            if (other == null) return false;
 
-            bool noX = A.x + a <= other.A.x || other.A.x + other.a <= A.x;//если один из них находится полностью левее другого
-            bool noY = A.y - b >= other.A.y || other.A.y - other.b >= A.y;//если один находится полностью ниже другого
+            bool noX = Ax + a <= other.Ax || other.Ax + other.a <= Ax;
+            bool noY = Ay - b >= other.Ay || other.Ay - other.b >= Ay;
 
             return !noX && !noY;
         }
@@ -207,7 +197,7 @@ namespace Lab5
                 if (verts[i] > mx) mx = verts[i];
             }
 
-            return mn <= eps && mx >= -eps;
+            return mn <= 0 && mx >= 0;
         }
 
         public static double readD(string msg)
@@ -236,46 +226,51 @@ namespace Lab5
                 Console.WriteLine("Число должно быть > 0");
             }
         }
-    }
 
-    internal class Program
-    {
-        static void Main(string[] args)
+
+
+
+        class Program
         {
+            static void Main(string[] args)
+            {
 
-            Rect r1 = new Rect();
-            Console.WriteLine("Прямоугольник по умолчанию:");
-            r1.output();
+                Rect r1 = new Rect();
+                Console.WriteLine("Прямоугольник по умолчанию:");
+                r1.output();
 
-            Console.WriteLine("\nВведите прямоугольник R2:");
-            Rect r2 = new Rect();
-            r2.input();
+                Console.WriteLine("\nВведите прямоугольник R2:");
+                Rect r2 = new Rect();
+                r2.input();
 
-            Console.WriteLine("\nR2:");
-            r2.output();
+                Console.WriteLine("\nR2:");
+                r2.output();
 
-            Console.WriteLine("\nПериметр = " + r2.perimeter().ToString("0.###"));
-            Console.WriteLine("Площадь = " + r2.area().ToString("0.###"));
-            Console.WriteLine("Центр опис. окр. = " + r2.center());
-            Console.WriteLine("Квадрат? " + (r2.isSquare() ? "Да" : "Нет"));
+                Console.WriteLine("\nПериметр = " + r2.perimeter().ToString("0.###"));
+                Console.WriteLine("Площадь = " + r2.area().ToString("0.###"));
+                Console.WriteLine("Центр опис. окр. = " + r2.center());
+                Console.WriteLine("Квадрат? " + (r2.isSquare() ? "Да" : "Нет"));
 
-            Console.WriteLine("\nСимметричный относительно (0;0):");
-            Rect sym = r2.symOrigin();
-            sym.output();
+                Console.WriteLine("\nСимметричный относительно (0;0):");
+                Rect sym = r2.symOrigin();
+                sym.output();
 
-            Console.WriteLine("\nПодобны R1 и R2?   " + (r1.isSimilar(r2) ? "Да" : "Нет"));
+                Console.WriteLine("\nПодобны R1 и R2?   " + (r1.isSimilar(r2) ? "Да" : "Нет"));
 
-            Console.WriteLine("\nR2 пересекает все четверти?   " + (r2.coversAll() ? "Да" : "Нет"));
+                Console.WriteLine("\nR2 пересекает все четверти?   " + (r2.coversAll() ? "Да" : "Нет"));
 
-            Console.WriteLine("\nR1 и R2 пересекаются?   " + (r1.intersects(r2) ? "Да" : "Нет"));
+                Console.WriteLine("\nR1 и R2 пересекаются?   " + (r1.intersects(r2) ? "Да" : "Нет"));
 
-            Console.WriteLine("\nПроверка пересечения R2 с прямой (la*x + lb*y + lc = 0):");
-            double la = Rect.readD("la = ");
-            double lb = Rect.readD("lb = ");
-            double lc = Rect.readD("lc = ");
-            Console.WriteLine("Прямая пересекает R2?   " + (r2.lineIntersects(la, lb, lc) ? "Да" : "Нет"));
+                Console.WriteLine("\nПроверка пересечения R2 с прямой (la*x + lb*y + lc = 0):");
+
+                double la = Rect.readD("la = ");
+                double lb = Rect.readD("lb = ");
+                double lc = Rect.readD("lc = ");
+
+                Console.WriteLine("Прямая пересекает R2?   " + (r2.lineIntersects(la, lb, lc) ? "Да" : "Нет"));
+            }
+
+
         }
-
-        
     }
 }
