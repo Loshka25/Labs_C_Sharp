@@ -49,7 +49,7 @@ class Program
             }
             else
             {
-                Console.WriteLine($"[Ошибка] Не удалось преобразовать '{input}' в тип {typeof(T).Name}");
+                Console.WriteLine($"Не удалось преобразовать '{input}' в тип {typeof(T).Name}");
             }
         }
 
